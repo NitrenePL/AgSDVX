@@ -1,0 +1,79 @@
+{
+  "name": "KMSimulator",
+  "type": "RISC-V",
+  "dependenceList": [],
+  "srcDirs": [
+    "Core",
+    "Debug",
+    "Ld",
+    "Peripheral",
+    "Startup",
+    "User"
+  ],
+  "virtualFolder": {
+    "name": "<virtual_root>",
+    "files": [],
+    "folders": []
+  },
+  "outDir": "build",
+  "deviceName": null,
+  "packDir": null,
+  "miscInfo": {
+    "uid": "8a7f68263849f9828fdb74954b21ef80"
+  },
+  "targets": {
+    "obj": {
+      "excludeList": [],
+      "toolchain": "RISCV_GCC",
+      "compileConfig": {
+        "linkerScriptPath": "Ld/Link.ld",
+        "options": "null"
+      },
+      "uploader": "Custom",
+      "uploadConfig": {
+        "bin": "",
+        "commandLine": "\"./OpenOCD/bin/openocd.exe\" -f ./OpenOCD/bin/wch-riscv.cfg -c init -c halt -c \"flash erase_sector wch_riscv 0 last\" -c \"program ./build/obj/${ProjectName}.elf\" -c \"verify_image ./build/obj/${ProjectName}.elf\" -c wlink_reset_resume -c exit",
+        "eraseChipCommand": ""
+      },
+      "uploadConfigMap": {
+        "JLink": {
+          "bin": "",
+          "baseAddr": "",
+          "cpuInfo": {
+            "vendor": "null",
+            "cpuName": "null"
+          },
+          "proType": 1,
+          "speed": 8000,
+          "otherCmds": ""
+        },
+        "OpenOCD": {
+          "bin": "",
+          "target": "${workspaceFolder}/wch-riscv",
+          "interface": "${workspaceFolder}/wch-riscv",
+          "baseAddr": "0x08000000"
+        },
+        "Custom": {
+          "bin": "",
+          "commandLine": "",
+          "eraseChipCommand": ""
+        }
+      },
+      "custom_dep": {
+        "name": "default",
+        "incList": [
+          "Debug",
+          "Core",
+          "User",
+          "Startup",
+          "Peripheral/inc",
+          "User/Meowpad"
+        ],
+        "libList": [],
+        "sourceDirList": [],
+        "defineList": []
+      }
+    }
+  },
+  "version": "3.3"
+}

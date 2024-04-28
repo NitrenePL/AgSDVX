@@ -1,0 +1,85 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "files.autoGuessEncoding": true,
+        "C_Cpp.default.configurationProvider": "cl.eide",
+        "C_Cpp.errorSquiggles": "disabled",
+        "[yaml]": {
+            "editor.insertSpaces": true,
+            "editor.tabSize": 4,
+            "editor.autoIndent": "advanced"
+        },
+        "cortex-debug.openocdPath": "./OpenOCD/bin/openocd.exe",
+        "files.associations": {
+            "*.ino": "cpp",
+            "*.json": "json",
+            ".meowkey": "code-text-binary",
+            "cmath": "cpp",
+            "algorithm": "cpp",
+            "cstdlib": "cpp",
+            "array": "cpp",
+            "cstdint": "cpp",
+            "string": "cpp",
+            "vector": "cpp",
+            "system_error": "cpp",
+            "functional": "cpp",
+            "tuple": "cpp",
+            "type_traits": "cpp",
+            "utility": "cpp",
+            "optional": "cpp",
+            "xtr1common": "cpp",
+            "xutility": "cpp",
+            "atomic": "cpp",
+            "bit": "cpp",
+            "*.tcc": "cpp",
+            "cctype": "cpp",
+            "clocale": "cpp",
+            "compare": "cpp",
+            "concepts": "cpp",
+            "cstdarg": "cpp",
+            "cstddef": "cpp",
+            "cstdio": "cpp",
+            "cstring": "cpp",
+            "cwchar": "cpp",
+            "cwctype": "cpp",
+            "deque": "cpp",
+            "unordered_map": "cpp",
+            "exception": "cpp",
+            "iterator": "cpp",
+            "memory": "cpp",
+            "memory_resource": "cpp",
+            "numeric": "cpp",
+            "random": "cpp",
+            "string_view": "cpp",
+            "initializer_list": "cpp",
+            "iosfwd": "cpp",
+            "limits": "cpp",
+            "new": "cpp",
+            "numbers": "cpp",
+            "ostream": "cpp",
+            "stdexcept": "cpp",
+            "streambuf": "cpp",
+            "typeinfo": "cpp",
+            "xmemory": "cpp",
+            "cfenv": "cpp",
+            "ch32v30x_usbhs_device.h": "c"
+        },
+    },
+    "extensions": {
+        "recommendations": [
+            "cl.eide",
+            "keroc.hex-fmt",
+            "xiaoyongdong.srecord",
+            "hars.cppsnippets",
+            "zixuanwang.linkerscript",
+            "redhat.vscode-yaml",
+            "IBM.output-colorizer",
+            "cschlosser.doxdocgen",
+            "ms-vscode.vscode-serial-monitor"
+        ]
+    }
+}
