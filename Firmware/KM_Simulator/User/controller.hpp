@@ -206,12 +206,13 @@ void Rotary_TIM_Init()
 
 struct __attribute__((packed)) SDVXData {
     u16 buttons;
+    u8 reserved;
     u8 xAxis;
     u8 yAxis;
     u8 zAxis;
 };
 
-__attribute__((aligned(4))) uint8_t HID_Report_Buffer[5];    // HID Report Buffer
+__attribute__((aligned(4))) uint8_t HID_Report_Buffer[6];    // HID Report Buffer
 volatile uint8_t HID_Set_Report_Flag = SET_REPORT_DEAL_OVER; // HID SetReport flag
 
 void Rotary_TIM_Scan(void)
@@ -229,7 +230,7 @@ void Rotary_TIM_Scan(void)
  */
 void Rotary_Button_Handle()
 {
-    u8 rdata[5]   = {0};
+    u8 rdata[6]   = {0};
     SDVXData data = {0};
 
     data.xAxis = (u8)((s16)(counter_left / ENCODER_SENSITIVITY) % 256);
@@ -245,7 +246,7 @@ void Rotary_Button_Handle()
     }
 
     memcpy(rdata, &data, sizeof(SDVXData));
-    USBHS_Endp_DataUp(DEF_UEP2, rdata, 5, DEF_UEP_CPY_LOAD);
+    USBHS_Endp_DataUp(DEF_UEP2, rdata, 6, DEF_UEP_CPY_LOAD);
 }
 
 void TIM3_IRQHandler(void)
