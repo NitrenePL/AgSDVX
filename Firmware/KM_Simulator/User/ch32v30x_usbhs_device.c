@@ -55,7 +55,7 @@ __attribute__((aligned(4))) uint8_t USBHS_EP0_Buf[DEF_USBD_UEP0_SIZE];     // ep
 __attribute__((aligned(4))) uint8_t USBHS_EP1_TX_Buf[DEF_USB_EP1_HS_SIZE]; // ep1(64)
 __attribute__((aligned(4))) uint8_t USBHS_EP2_Buf[DEF_USB_EP2_HS_SIZE];    // ep2(64)
 
-extern uint8_t HID_Report_Buffer[5];
+extern uint8_t HID_Report_Buffer[4];
 
 /* USB IN Endpoint Busy Flag */
 volatile uint8_t USBHS_Endp_Busy[DEF_UEP_NUM];
@@ -362,7 +362,7 @@ void USBHS_IRQHandler(void)
                         //                        printf("Set %d:\n", HID_Set_Report_Flag);
                         //                     if (intst & USBHS_UIS_TOG_OK) {
                         if (HID_Set_Report_Flag == SET_REPORT_DEAL_OVER) {
-                            memcpy(HID_Report_Buffer, USBHS_EP2_Buf, 5);
+                            memcpy(HID_Report_Buffer, USBHS_EP2_Buf, 4);
                             HID_Set_Report_Flag  = SET_REPORT_WAIT_DEAL;
                             USBHSD->UEP2_RX_CTRL = USBHS_UEP_R_RES_NAK | USBHS_UEP_R_TOG_DATA1;
                         } else {

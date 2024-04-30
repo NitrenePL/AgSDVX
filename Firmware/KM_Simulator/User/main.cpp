@@ -30,7 +30,6 @@ int main(void)
     printf("Rotary OK!\r\n");
 
     while (1) {
-        // Rotary_Scan();
         Rotary_TIM_Scan();
         KB_Scan();
     }
