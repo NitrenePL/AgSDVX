@@ -205,9 +205,9 @@ void Rotary_TIM_Init()
 };
 
 struct __attribute__((packed)) SDVXData {
-    u16 buttons;
     u8 xAxis;
     u8 yAxis;
+    u16 buttons;
 
 };
 
