@@ -8,6 +8,7 @@
 #include "string.h"
 #include "usbd_desc.h"
 #include "boost/endian.hpp"
+#include "ws2812b.hpp"
 
 /*******************************************************************************/
 /* Variable Definition */
@@ -28,6 +29,7 @@ volatile double ENCODER_SENSITIVITY = 1.5625;
 /* Interrupt Function Declaration */
 extern "C" {
 void TIM3_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+void TIM2_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 }
 
 void TIM3_Init(uint16_t arr, uint16_t psc)
@@ -54,13 +56,37 @@ void TIM3_Init(uint16_t arr, uint16_t psc)
     TIM_Cmd(TIM3, ENABLE);
 }
 
+void TIM2_Init(u16 arr, u16 psc)
+{
+    TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+    NVIC_InitTypeDef NVIC_InitStructure;
+
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+
+    TIM_TimeBaseStructure.TIM_Period        = arr;
+    TIM_TimeBaseStructure.TIM_Prescaler     = psc;
+    TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
+    TIM_TimeBaseStructure.TIM_CounterMode   = TIM_CounterMode_Up;
+    TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
+
+    TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
+
+    NVIC_InitStructure.NVIC_IRQChannel                   = TIM2_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority        = 4;
+    NVIC_InitStructure.NVIC_IRQChannelCmd                = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
+
+    TIM_Cmd(TIM2, ENABLE);
+}
+
 /*
     BT_A    PC0
     BT_B    PC1
     BT_C    PB12
     BT_D    PB13
 
-    FX_L    PC2
+    FX_L    PC20000000000
     FX_R    PB14
 
     START   PB11
@@ -208,7 +234,6 @@ struct __attribute__((packed)) SDVXData {
     u8 xAxis;
     u8 yAxis;
     u16 buttons;
-
 };
 
 __attribute__((aligned(4))) uint8_t HID_Report_Buffer[4];    // HID Report Buffer
@@ -242,9 +267,95 @@ void Rotary_Button_Handle()
             data.buttons &= ~((uint16_t)1 << i);
         }
     }
-    
+
     memcpy(rdata, &data, sizeof(SDVXData));
     USBHS_Endp_DataUp(DEF_UEP2, rdata, 4, DEF_UEP_CPY_LOAD);
+}
+
+void TranscendLights_Init(void)
+{
+
+    for (int i = 0; i < 18; i++) {
+        rgb_SetColor(i, PURPLE);
+    }
+
+    LED_Send();
+}
+
+RGB HSBtoRGB(u8 hue, u8 saturation, u8 brightness)
+{
+    RGB rgb;
+    u8 region, remainder, p, q, t;
+
+    if (saturation == 0) {
+        rgb.R = brightness;
+        rgb.G = brightness;
+        rgb.B = brightness;
+        return rgb;
+    }
+
+    region    = hue / 43;
+    remainder = (hue - (region * 43)) * 6;
+
+    p = (brightness * (255 - saturation)) >> 8;
+    q = (brightness * (255 - ((saturation * remainder) >> 8))) >> 8;
+    t = (brightness * (255 - ((saturation * (255 - remainder)) >> 8))) >> 8;
+
+    switch (region) {
+        case 0:
+            rgb.R = brightness;
+            rgb.G = t;
+            rgb.B = p;
+            break;
+        case 1:
+            rgb.R = q;
+            rgb.G = brightness;
+            rgb.B = p;
+            break;
+        case 2:
+            rgb.R = p;
+            rgb.G = brightness;
+            rgb.B = t;
+            break;
+        case 3:
+            rgb.R = p;
+            rgb.G = q;
+            rgb.B = brightness;
+            break;
+        case 4:
+            rgb.R = t;
+            rgb.G = p;
+            rgb.B = brightness;
+            break;
+        default:
+            rgb.R = brightness;
+            rgb.G = p;
+            rgb.B = q;
+            break;
+    }
+
+    // Halved to save power
+    rgb.R /= 2;
+    rgb.G /= 2;
+    rgb.B /= 2;
+
+    return rgb;
+}
+
+volatile bool RainbowFlag;
+
+void gradientRainbowEffect()
+{
+    static u8 hue = 0;
+    // printf("%d\r", RainbowFlag);
+    if (RainbowFlag) {
+        for (int i = 0; i < NUM_LED; i++) {
+            u8 scaledHue = (i * 256 / NUM_LED) + hue;
+            rgb_SetColor(i, HSBtoRGB(scaledHue, 255, 255));
+        }
+        hue++;
+        LED_Send();
+    }
 }
 
 void TIM3_IRQHandler(void)
@@ -257,6 +368,20 @@ void TIM3_IRQHandler(void)
         if (USBHS_DevEnumStatus) {
             /* Handle Rotary_encoder & Buttons */
             Rotary_Button_Handle();
+        }
+    }
+}
+
+void TIM2_IRQHandler(void)
+{
+    if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
+        /* Clear interrupt flag */
+        TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
+
+        if (RainbowFlag) {
+            RainbowFlag = false;
+        } else {
+            RainbowFlag = true;
         }
     }
 }
