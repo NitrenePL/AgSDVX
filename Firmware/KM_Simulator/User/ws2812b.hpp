@@ -65,12 +65,13 @@ struct __attribute__((packed)) RGB {
     u8 B;
 };
 
+// not in use
 // Low Light Level
-extern const RGB WHITE    = {128, 128, 128};
-extern const RGB RED      = {128, 0, 0};
-extern const RGB GREEN    = {0, 128, 0};
-extern const RGB BLUE     = {0, 0, 128};
-extern const RGB PURPLE   = {128, 0, 128};
+extern const RGB WHITE  = {128, 128, 128};
+extern const RGB RED    = {128, 0, 0};
+extern const RGB GREEN  = {0, 128, 0};
+extern const RGB BLUE   = {0, 0, 128};
+extern const RGB PURPLE = {128, 0, 128};
 
 // Medium Light Level
 // extern const RGB WHITE    = {192, 192, 192};
@@ -116,8 +117,7 @@ void rgb_SetColor(u16 LedId, RGB Color)
 void Spi_Send(u8 *buf, u16 len)
 {
     for (u16 i = 0; i < len; i++) {
-        while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE) == RESET)
-            ;
+        while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE) == RESET);
         SPI_NSSInternalSoftwareConfig(SPI2, SPI_NSSInternalSoft_Set);
         SPI_I2S_SendData(SPI2, buf[i]);
     }

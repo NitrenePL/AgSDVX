@@ -16,7 +16,6 @@
 /* Keyboard */
 volatile bool KB_Scan_Done     = false;
 volatile u8 Scan_Key_Status[7] = {0};
-volatile u16 btns              = 0;
 
 /* Rotary */
 volatile s16 counter_left           = 0;
@@ -86,7 +85,7 @@ void TIM2_Init(u16 arr, u16 psc)
     BT_C    PB12
     BT_D    PB13
 
-    FX_L    PC20000000000
+    FX_L    PC2
     FX_R    PB14
 
     START   PB11
@@ -272,6 +271,13 @@ void Rotary_Button_Handle()
     USBHS_Endp_DataUp(DEF_UEP2, rdata, 4, DEF_UEP_CPY_LOAD);
 }
 
+/*********************************************************************
+ * @fn      TranscendLights_Init
+ *
+ * @brief   Initialize WS2812B, dev
+ *
+ * @return  none
+ */
 void TranscendLights_Init(void)
 {
 
@@ -282,6 +288,13 @@ void TranscendLights_Init(void)
     LED_Send();
 }
 
+/*********************************************************************
+ * @fn      HSBtoRGB
+ *
+ * @brief   change HSB to RGB
+ *
+ * @return  none
+ */
 RGB HSBtoRGB(u8 hue, u8 saturation, u8 brightness)
 {
     RGB rgb;
