@@ -44,7 +44,8 @@ int main(void)
 
     while (1) {
         Rotary_TIM_Scan();
-        KB_Scan();
+        // KB_Scan();
+        BTN_Scan();
 
         gradientRainbowEffect();
     }

@@ -10,6 +10,8 @@
 #include "boost/endian.hpp"
 #include "ws2812b.hpp"
 
+#define NUM_BTN         7
+#define DEBOUNCE_CHECKS 1440
 /*******************************************************************************/
 /* Variable Definition */
 
@@ -94,6 +96,24 @@ void TIM2_Init(u16 arr, u16 psc)
     Encoder_R   PA2(white)  PA3(green)
 */
 
+struct __attribute__((packed)) BTN {
+    GPIO_TypeDef *GPIOx;
+    uint16_t GPIO_Pin;
+
+    u16 counterRelease;
+    uint8_t state;
+};
+
+BTN btns[NUM_BTN] = {
+    {GPIOC, GPIO_Pin_0, 0, 0},  // BT_A
+    {GPIOC, GPIO_Pin_1, 0, 0},  // BT_B
+    {GPIOB, GPIO_Pin_12, 0, 0}, // BT_C
+    {GPIOB, GPIO_Pin_13, 0, 0}, // BT_D
+    {GPIOC, GPIO_Pin_2, 0, 0},  // FX_L
+    {GPIOB, GPIO_Pin_14, 0, 0}, // FX_R
+    {GPIOB, GPIO_Pin_11, 0, 0}, // START
+};
+
 void KB_Scan_Init(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure = {0};
@@ -126,6 +146,24 @@ void KB_Scan(void)
     Scan_Key_Status[4] = GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_2) == 0 ? true : false;  // FX_L
     Scan_Key_Status[5] = GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_14) == 0 ? true : false; // FX_R
     Scan_Key_Status[6] = GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_11) == 0 ? true : false; //  START
+}
+
+void BTN_Scan(void)
+{
+    for (int i = 0; i < NUM_BTN; i++) {
+        u8 currentReading = GPIO_ReadInputDataBit(btns[i].GPIOx, btns[i].GPIO_Pin);
+        if (currentReading == 0) { // 低电平有效
+            btns[i].state          = 1;
+            btns[i].counterRelease = 0;
+        } else {
+            if (btns[i].counterRelease < DEBOUNCE_CHECKS) {
+                btns[i].counterRelease++;
+            } else {
+                btns[i].state = 0;
+            }
+        }
+        Scan_Key_Status[i] = btns[i].state;
+    }
 }
 
 /*********************************************************************
