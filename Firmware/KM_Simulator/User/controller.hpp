@@ -2,16 +2,15 @@
 
 /*******************************************************************************/
 /* Header Files */
-#include "ch32v30x_usbhs_device.h"
 #include "stdbool.h"
 #include "debug.h"
 #include "string.h"
-#include "usbd_desc.h"
 #include "boost/endian.hpp"
 #include "ws2812b.hpp"
+#include "hid_keyboard_template.h"
 
-#define NUM_BTN         7
-#define DEBOUNCE_CHECKS 1440
+
+#define NUM_BTN 7
 /*******************************************************************************/
 /* Variable Definition */
 
@@ -30,7 +29,6 @@ volatile double ENCODER_SENSITIVITY = 1.5625;
 /* Interrupt Function Declaration */
 extern "C" {
 void TIM3_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
-void TIM2_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 }
 
 void TIM3_Init(uint16_t arr, uint16_t psc)
@@ -46,6 +44,7 @@ void TIM3_Init(uint16_t arr, uint16_t psc)
     TIM_TimeBaseStructure.TIM_CounterMode   = TIM_CounterMode_Up;
     TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);
 
+    TIM_ClearITPendingBit(TIM3,TIM_IT_Update);
     TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
 
     NVIC_InitStructure.NVIC_IRQChannel                   = TIM3_IRQn;
@@ -57,29 +56,30 @@ void TIM3_Init(uint16_t arr, uint16_t psc)
     TIM_Cmd(TIM3, ENABLE);
 }
 
-void TIM2_Init(u16 arr, u16 psc)
-{
-    TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-    NVIC_InitTypeDef NVIC_InitStructure;
+// void TIM2_Init(u16 arr, u16 psc)
+// {
+//     TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+//     NVIC_InitTypeDef NVIC_InitStructure;
 
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+//     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 
-    TIM_TimeBaseStructure.TIM_Period        = arr;
-    TIM_TimeBaseStructure.TIM_Prescaler     = psc;
-    TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-    TIM_TimeBaseStructure.TIM_CounterMode   = TIM_CounterMode_Up;
-    TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
+//     TIM_TimeBaseStructure.TIM_Period        = arr;
+//     TIM_TimeBaseStructure.TIM_Prescaler     = psc;
+//     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
+//     TIM_TimeBaseStructure.TIM_CounterMode   = TIM_CounterMode_Up;
+//     TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
 
-    TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
+// 	TIM_ClearITPendingBit(TIM2,TIM_IT_Update);
+//     TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
 
-    NVIC_InitStructure.NVIC_IRQChannel                   = TIM2_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority        = 4;
-    NVIC_InitStructure.NVIC_IRQChannelCmd                = ENABLE;
-    NVIC_Init(&NVIC_InitStructure);
+//     NVIC_InitStructure.NVIC_IRQChannel                   = TIM2_IRQn;
+//     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3;
+//     NVIC_InitStructure.NVIC_IRQChannelSubPriority        = 4;
+//     NVIC_InitStructure.NVIC_IRQChannelCmd                = ENABLE;
 
-    TIM_Cmd(TIM2, ENABLE);
-}
+//     NVIC_Init(&NVIC_InitStructure);
+//     TIM_Cmd(TIM2, ENABLE);
+// }
 
 /*
     BT_A    PC0
@@ -148,6 +148,7 @@ void KB_Scan(void)
     Scan_Key_Status[6] = GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_11) == 0 ? true : false; //  START
 }
 
+volatile u32 DEBOUNCE_CHECKS = 144;
 void BTN_Scan(void)
 {
     for (int i = 0; i < NUM_BTN; i++) {
@@ -273,9 +274,6 @@ struct __attribute__((packed)) SDVXData {
     u16 buttons;
 };
 
-__attribute__((aligned(4))) uint8_t HID_Report_Buffer[4];    // HID Report Buffer
-volatile uint8_t HID_Set_Report_Flag = SET_REPORT_DEAL_OVER; // HID SetReport flag
-
 void Rotary_TIM_Scan(void)
 {
     counter_left  = TIM_GetCounter(TIM10);
@@ -306,24 +304,7 @@ void Rotary_Button_Handle()
     }
 
     memcpy(rdata, &data, sizeof(SDVXData));
-    USBHS_Endp_DataUp(DEF_UEP2, rdata, 4, DEF_UEP_CPY_LOAD);
-}
-
-/*********************************************************************
- * @fn      TranscendLights_Init
- *
- * @brief   Initialize WS2812B, dev
- *
- * @return  none
- */
-void TranscendLights_Init(void)
-{
-
-    for (int i = 0; i < 18; i++) {
-        rgb_SetColor(i, PURPLE);
-    }
-
-    LED_Send();
+    send_report(0, rdata);
 }
 
 /*********************************************************************
@@ -415,24 +396,8 @@ void TIM3_IRQHandler(void)
         /* Clear interrupt flag */
         TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
 
-        /* Handle keyboard scan */
-        if (USBHS_DevEnumStatus) {
-            /* Handle Rotary_encoder & Buttons */
-            Rotary_Button_Handle();
-        }
+        /* Handle Rotary_encoder & Buttons */
+        Rotary_Button_Handle();
     }
 }
 
-void TIM2_IRQHandler(void)
-{
-    if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
-        /* Clear interrupt flag */
-        TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
-
-        if (RainbowFlag) {
-            RainbowFlag = false;
-        } else {
-            RainbowFlag = true;
-        }
-    }
-}

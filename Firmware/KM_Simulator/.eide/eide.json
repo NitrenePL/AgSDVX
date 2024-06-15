@@ -13,7 +13,23 @@
   "virtualFolder": {
     "name": "<virtual_root>",
     "files": [],
-    "folders": []
+    "folders": [
+      {
+        "name": "cherryusb",
+        "files": [
+          {
+            "path": "CherryUSB/class/hid/usbd_hid.c"
+          },
+          {
+            "path": "CherryUSB/core/usbd_core.c"
+          },
+          {
+            "path": "CherryUSB/port/ch32/usb_dc_usbhs.c"
+          }
+        ],
+        "folders": []
+      }
+    ]
   },
   "outDir": "build",
   "deviceName": null,
@@ -23,7 +39,41 @@
   },
   "targets": {
     "obj": {
-      "excludeList": [],
+      "excludeList": [
+        "User/CherryUSB/demo",
+        "User/CherryUSB/core/usbh_core.c",
+        "User/CherryUSB/core/usbh_core.h",
+        "User/CherryUSB/class/audio",
+        "User/CherryUSB/class/cdc",
+        "User/CherryUSB/class/dfu",
+        "User/CherryUSB/class/hub",
+        "User/CherryUSB/class/midi",
+        "User/CherryUSB/class/msc",
+        "User/CherryUSB/class/template",
+        "User/CherryUSB/class/vendor",
+        "User/CherryUSB/class/video",
+        "User/CherryUSB/class/wireless",
+        "User/CherryUSB/platform",
+        "User/CherryUSB/third_party",
+        "User/CherryUSB/tools",
+        "User/CherryUSB/osal",
+        "User/CherryUSB/docs",
+        "User/CherryUSB/port/aic",
+        "User/CherryUSB/port/bouffalolab",
+        "User/CherryUSB/port/dwc2",
+        "User/CherryUSB/port/ehci",
+        "User/CherryUSB/port/fsdev",
+        "User/CherryUSB/port/hpm",
+        "User/CherryUSB/port/musb",
+        "User/CherryUSB/port/nuvoton",
+        "User/CherryUSB/port/ohci",
+        "User/CherryUSB/port/pusb2",
+        "User/CherryUSB/port/template",
+        "User/CherryUSB/class/hid/usbh_hid.c",
+        "User/CherryUSB/port/ch32/usb_ch58x_dc_usbfs.c",
+        "User/CherryUSB/port/ch32/usb_dc_usbfs.c",
+        "User/CherryUSB/port/ch32/usb_dc_usbhs.c"
+      ],
       "toolchain": "RISCV_GCC",
       "compileConfig": {
         "linkerScriptPath": "Ld/Link.ld",
@@ -67,11 +117,16 @@
           "User",
           "Startup",
           "Peripheral/inc",
-          "User/Meowpad"
+          "CherryUSB/class/hid",
+          "CherryUSB/common",
+          "CherryUSB/core",
+          "CherryUSB/port/ch32"
         ],
         "libList": [],
         "sourceDirList": [],
-        "defineList": []
+        "defineList": [
+          "CONFIG_USB_HS"
+        ]
       }
     }
   },

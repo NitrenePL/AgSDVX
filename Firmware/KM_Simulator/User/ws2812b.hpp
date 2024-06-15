@@ -1,4 +1,7 @@
+#pragma once
+
 #include "debug.h"
+#include <cstring>
 
 #define NUM_LED 18   // 灯光数量
 #define CODE0   0x80 // 0码 1000 0000
@@ -67,11 +70,16 @@ struct __attribute__((packed)) RGB {
 
 // not in use
 // Low Light Level
-extern const RGB WHITE  = {128, 128, 128};
-extern const RGB RED    = {128, 0, 0};
-extern const RGB GREEN  = {0, 128, 0};
-extern const RGB BLUE   = {0, 0, 128};
-extern const RGB PURPLE = {128, 0, 128};
+// extern const RGB WHITE    = {128, 128, 128};
+// extern const RGB RED      = {128, 0, 0};
+// extern const RGB GREEN    = {0, 128, 0};
+// extern const RGB BLUE     = {0, 0, 128};
+// extern const RGB PURPLE   = {128, 0, 128};
+
+extern const RGB YURINE     = {181, 109, 129};
+extern const RGB JASHINCHAN = {255, 241, 173};
+extern const RGB MEDUSA     = {153, 116, 190};
+extern const RGB MINOSU     = {95, 163, 207};
 
 // Medium Light Level
 // extern const RGB WHITE    = {192, 192, 192};
@@ -81,11 +89,12 @@ extern const RGB PURPLE = {128, 0, 128};
 // extern const RGB PURPLE   = {192, 0, 192};
 
 // High Light Level
-// extern const RGB WHITE    = {255, 255, 255};
-// extern const RGB RED      = {255, 0, 0};
-// extern const RGB GREEN    = {0, 255, 0};
-// extern const RGB BLUE     = {0, 0, 255};
-// extern const RGB PURPLE   = {255, 0, 255};
+extern const RGB WHITE  = {255, 255, 255};
+extern const RGB YELLOW = {255, 255, 0};
+extern const RGB RED    = {255, 0, 0};
+extern const RGB GREEN  = {0, 255, 0};
+extern const RGB BLUE   = {0, 0, 255};
+extern const RGB PURPLE = {255, 0, 255};
 
 extern const RGB NO_COLOR = {0, 0, 0};
 

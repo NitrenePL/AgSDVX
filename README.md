@@ -22,21 +22,19 @@
 - [x] 适配spicecfg
 - [x] 组装
 - [ ] 改进旋钮
-- [ ] 添加灯带
+- [x] 添加灯带
+- [x] 外壳改进
+- [x] 添加灯光颜色配置接口
+- [ ] 配置GUI界面
 
-## 图片预览
+## 预览
 
-- 台面，因为是拼版所以打了很多螺丝防塌
+- 机壳
 
-<img src="./pictures/台面.png" title="" alt="台面" style="zoom:50%;">
+<img title="" src="./pictures/机壳.png" alt="" style="zoom:50%;">
 
-旋钮有些偏大，橡胶圈也没加，预计下次更新时改进.
+<img title="" src="./pictures/实物.jpg" alt="" style="zoom:33%;">
 
+- 灯光配置锐意制作中
 
-
-- 内部线路
-
-<img src="./pictures/内部.png" title="" alt="内部" style="zoom:50%;">
-
-甚至底板都没做，随手切了块环氧板贴了上去
-由于按键灯有可能会影响按键，而且在组装时灯掉到按键里去了，于是果断取消了按键灯的安装，改而在台身添加灯带(待更新)
+- 
